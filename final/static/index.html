@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>GWI Agentic Chat Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        #sidebar {
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        #chat-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: transparent;
+        }
+        
+        #input-box {
+            display: flex;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            resize: none;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .message {
+            margin: 15px 0;
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .user { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .assistant { 
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            white-space: pre-wrap;
+        }
+        
+        .thought {
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border-left: 4px solid #ffc107;
+            font-style: italic;
+            margin-right: auto;
+            font-size: 14px;
+        }
+        
+        .evaluation {
+            background: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border-left: 4px solid #28a745;
+            margin-right: auto;
+            font-size: 14px;
+        }
+        
+        .adaptation {
+            background: rgba(111, 66, 193, 0.1);
+            color: #5a2d91;
+            border-left: 4px solid #6f42c1;
+            margin-right: auto;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .strategy {
+            background: rgba(23, 162, 184, 0.1);
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+            margin-right: auto;
+            font-size: 13px;
+        }
+        
+        .error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            margin-right: auto;
+        }
+        
+        .system { 
+            background: rgba(108, 117, 125, 0.1);
+            color: #495057;
+            text-align: center;
+            border-radius: 15px;
+            font-size: 14px;
+            margin: 10px auto;
+        }
+        
+        #feedback-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .feedback-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+        
+        .feedback-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .feedback-btn:active {
+            background: rgba(40, 167, 69, 0.3) !important;
+            transform: scale(0.95);
+        }
+        
+        .thumb-up {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        .thumb-down {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        #chatList {
+            list-style: none;
+        }
+        
+        #chatList li {
+            margin: 8px 0;
+            padding: 12px 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        #chatList li:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        #chatList li.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-left-color: #667eea;
+        }
+        
+        .sidebar-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .analytics {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .streaming {
+            position: relative;
+        }
+        
+        .streaming::after {
+            content: "▋";
+            animation: blink 1s infinite;
+            color: #667eea;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .performance-dashboard {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .performance-dashboard h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <div class="sidebar-header">💬 Your Chats</div>
+    <ul id="chatList"></ul>
+    <hr style="margin: 20px 0; border: none; height: 1px; background: rgba(0,0,0,0.1);" />
+    <button class="btn btn-secondary" style="width: 100%;" onclick="loadChats()">🔄 Refresh</button>
+    <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="togglePerformance()">📊 Performance</button>
+    <div id="analytics" class="analytics"></div>
+    <div id="performance" class="performance-dashboard" style="display: none;"></div>
+</div>
+
+<div id="chat-container">
+    <div id="chat-header">
+        <h2>🤖 GWI Research Assistant</h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span id="chatId" style="font-size: 12px; color: #666;"></span>
+            <button class="btn btn-secondary" onclick="exportChat()">📄 Export</button>
+            <button class="btn btn-secondary" onclick="newChat()">➕ New Chat</button>
+        </div>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div id="input-box">
+        <textarea id="messageInput" placeholder="Ask me about GWI market research insights..." rows="2"></textarea>
+        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+        <div id="feedback-buttons">
+            <button class="feedback-btn thumb-up" onclick="sendFeedback(1)" title="Helpful">👍</button>
+            <button class="feedback-btn thumb-down" onclick="sendFeedback(-1)" title="Not helpful">👎</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let userId = prompt("Enter your user ID:", "researcher") || "researcher";
+    let chatId = null;
+    let messagesDiv = document.getElementById("messages");
+    let isStreaming = false;
+
+    // Append message to chat window
+    function appendMessage(role, text) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "message " + role;
+        
+        if (role === "user") {
+            msgDiv.textContent = text;
+        } else if (role === "assistant") {
+            msgDiv.textContent = text;
+        } else if (role === "thought") {
+            msgDiv.textContent = "🤔 " + text;
+        } else if (role === "evaluation") {
+            msgDiv.textContent = "📊 " + text;
+        } else if (role === "adaptation") {
+            msgDiv.textContent = "🎯 " + text;
+        } else if (role === "strategy") {
+            msgDiv.textContent = "💡 " + text;
+        } else if (role === "error") {
+            msgDiv.textContent = "❌ " + text;
+        } else if (role === "citation") {
+            msgDiv.textContent = "📖 " + text;
+        } else if (role === "source") {
+            msgDiv.innerHTML = "🔗 " + text;
+        } else {
+            msgDiv.textContent = text;
+        }
+        
+        messagesDiv.appendChild(msgDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return msgDiv;
+    }
+
+    // Clear messages panel
+    function clearMessages() {
+        messagesDiv.innerHTML = "";
+    }
+
+    // Start new chat
+    function newChat() {
+        chatId = null;
+        clearMessages();
+        document.getElementById('chatId').textContent = '';
+        document.querySelectorAll('#chatList li').forEach(li => li.classList.remove('active'));
+        appendMessage("system", "🆕 Started new chat. Ask me anything about GWI market research!");
+    }
+
+    // Load analytics
+    async function loadAnalytics() {
+        try {
+            const res = await fetch('/analytics');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('analytics').innerHTML = `
+                    <strong>📈 Analytics</strong><br>
+                    Chats: ${data.total_chats}<br>
+                    Messages: ${data.total_messages}<br>
+                    Satisfaction: ${Math.round(data.satisfaction_rate * 100)}%<br>
+                    Feedback Count: ${data.feedback_count}
+                `;
+            }
+        } catch (e) {
+            console.error('Failed to load analytics:', e);
+        }
+    }
+
+    // Load performance dashboard
+    async function loadPerformance() {
+        try {
+            const res = await fetch('/performance');
+            if (res.ok) {
+                const data = await res.json();
+                const perfDiv = document.getElementById('performance');
+                
+                let perfHtml = '<h4>🎯 Adaptive Performance</h4>';
+                
+                // Basic stats
+                if (data.basic_stats) {
+                    perfHtml += `<div><strong>Basic:</strong> ${data.basic_stats.total_chats} chats, ${data.basic_stats.total_messages} messages</div>`;
+                }
+                
+                // Learning insights
+                if (data.learning_insights) {
+                    perfHtml += `<div><strong>Learning:</strong> ${data.learning_insights.total_patterns_learned} patterns learned</div>`;
+                }
+                
+                // Query patterns
+                if (data.query_patterns && Object.keys(data.query_patterns).length > 0) {
+                    perfHtml += '<div><strong>Query Success Rates:</strong><br>';
+                    for (const [pattern, stats] of Object.entries(data.query_patterns)) {
+                        const successRate = Math.round(stats.success_rate * 100);
+                        perfHtml += `${pattern}: ${successRate}% (${stats.total_queries})<br>`;
+                    }
+                    perfHtml += '</div>';
+                }
+                
+                // Current adaptive config
+                if (data.current_config) {
+                    perfHtml += `<div><strong>Config:</strong> VS:${data.current_config.vectorstore_weight?.toFixed(2)}, KB:${data.current_config.knowledge_base_weight?.toFixed(2)}, WS:${data.current_config.web_search_weight?.toFixed(2)}</div>`;
+                }
+                
+                perfDiv.innerHTML = perfHtml;
+            }
+        } catch (e) {
+            console.error('Failed to load performance:', e);
+        }
+    }
+
+    // Toggle performance dashboard
+    function togglePerformance() {
+        const perfDiv = document.getElementById('performance');
+        if (perfDiv.style.display === 'none') {
+            perfDiv.style.display = 'block';
+            loadPerformance();
+        } else {
+            perfDiv.style.display = 'none';
+        }
+    }
+
+    // Load chats in sidebar
+    async function loadChats() {
+        try {
+            const res = await fetch(`/list_user_chats?user_id=${encodeURIComponent(userId)}`);
+            if (!res.ok) {
+                alert("Failed to load chats");
+                return;
+            }
+            const chatIds = await res.json();
+            const chatList = document.getElementById("chatList");
+            chatList.innerHTML = "";
+            
+            chatIds.forEach(id => {
+                const li = document.createElement("li");
+                li.textContent = id.substring(0, 20) + (id.length > 20 ? "..." : "");
+                li.title = id;
+                li.onclick = () => resumeChat(id);
+                if (id === chatId) li.classList.add('active');
+                chatList.appendChild(li);
+            });
+            
+            loadAnalytics();
+        } catch (e) {
+            console.error('Failed to load chats:', e);
+        }
+    }
+
+    // Resume a chat by chat_id
+    async function resumeChat(id) {
+        try {
+            chatId = id;
+            clearMessages();
+            document.getElementById('chatId').textContent = `Chat: ${chatId.substring(0, 8)}...`;
+            
+            // Update active chat in sidebar
+            document.querySelectorAll('#chatList li').forEach(li => li.classList.remove('active'));
+            document.querySelector(`#chatList li[title="${id}"]`)?.classList.add('active');
+            
+            appendMessage("system", "🔁 Resuming chat: " + chatId.substring(0, 20) + "...");
+
+            const res = await fetch(`/resume?user_id=${encodeURIComponent(userId)}&chat_id=${encodeURIComponent(chatId)}`);
+            if (!res.ok) {
+                alert("Failed to resume chat");
+                return;
+            }
+            const history = await res.json();
+            for (const msg of history) {
+                appendMessage(msg.role, msg.content);
+            }
+        } catch (e) {
+            console.error('Failed to resume chat:', e);
+            alert("Failed to resume chat");
+        }
+    }
+
+    // Send message (POST /chat)
+    async function sendMessage() {
+        if (isStreaming) {
+            alert("Please wait for the current response to complete.");
+            return;
+        }
+
+        const input = document.getElementById("messageInput");
+        const msg = input.value.trim();
+        if (!msg) return;
+        
+        appendMessage("user", msg);
+        input.value = "";
+        isStreaming = true;
+
+        try {
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg, user_id: userId, chat_id: chatId })
+            });
+
+            if (!response.ok) {
+                appendMessage("error", "Server error occurred");
+                isStreaming = false;
+                return;
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let done = false;
+            let currentMessage = null;
+            let currentRole = "assistant";
+            let buffer = "";
+
+            while (!done) {
+                const { value, done: doneReading } = await reader.read();
+                done = doneReading;
+                
+                if (value) {
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop() || ""; // Keep incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (!line.startsWith("data: ")) continue;
+                        
+                        const content = line.replace("data: ", "")
+                        if (content === "" || content === "[END]") continue;
+                        
+                        console.log("Received content:", content); // Debug log
+                        
+                        // Handle special markers
+                        if (content.startsWith("[THOUGHT]")) {
+                            currentRole = "thought";
+                            currentMessage = appendMessage("thought", content.replace("[THOUGHT]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[EVALUATION]")) {
+                            currentRole = "evaluation";
+                            currentMessage = appendMessage("evaluation", content.replace("[EVALUATION]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[ADAPTATION]")) {
+                            currentRole = "adaptation";
+                            currentMessage = appendMessage("adaptation", content.replace("[ADAPTATION]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[STRATEGY]")) {
+                            currentRole = "strategy";
+                            currentMessage = appendMessage("strategy", content.replace("[STRATEGY]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[ERROR]")) {
+                            currentRole = "error";
+                            currentMessage = appendMessage("error", content.replace("[ERROR]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[CITATION]")) {
+                            currentRole = "citation";
+                            currentMessage = appendMessage("citation", content.replace("[CITATION]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[SOURCE]")) {
+                            currentRole = "source";
+                            currentMessage = appendMessage("source", content.replace("[SOURCE]", "").trim());
+                            continue;
+                        } else if (content.startsWith("[ASSISTANT]")) {
+                            currentRole = "assistant";
+                            if (currentMessage) {
+                                currentMessage.classList.remove("streaming");
+                            }
+                            currentMessage = appendMessage("assistant", "");
+                            currentMessage.classList.add("streaming");
+                            continue;
+                        }
+                        
+                        // Regular content
+                        if (currentRole === "assistant") {
+                            if (!currentMessage) {
+                                currentMessage = appendMessage("assistant", "");
+                                currentMessage.classList.add("streaming");
+                            }
+                            currentMessage.textContent += content;
+                        } else if (currentMessage) {
+                            // Append to current special message
+                            currentMessage.textContent += content;
+                        }
+                    }
+                }
+            }
+            
+            if (currentMessage) {
+                currentMessage.classList.remove("streaming");
+            }
+            
+            // Extract chatId from response headers if available
+            const responseChatId = response.headers.get('x-chat-id');
+            if (responseChatId && !chatId) {
+                chatId = responseChatId;
+                document.getElementById('chatId').textContent = `Chat: ${chatId.substring(0, 8)}...`;
+            }
+            
+            // Update chat list if new chat or chat ID wasn't set
+            if (!document.querySelector(`#chatList li[title="${chatId}"]`)) {
+                loadChats();
+            }
+        } catch (e) {
+            console.error('Failed to send message:', e);
+            appendMessage("error", "Failed to send message. Please try again.");
+        } finally {
+            isStreaming = false;
+        }
+    }
+
+    // Export chat to markdown/html
+    async function exportChat() {
+        if (!chatId) {
+            alert("Start or resume a chat first.");
+            return;
+        }
+        try {
+            const res = await fetch(`/export?user_id=${encodeURIComponent(userId)}&chat_id=${encodeURIComponent(chatId)}`);
+            if (!res.ok) {
+                alert("Export failed");
+                return;
+            }
+            const html = await res.text();
+            const w = window.open();
+            w.document.write(html);
+            w.document.close();
+        } catch (e) {
+            console.error('Failed to export chat:', e);
+            alert("Export failed");
+        }
+    }
+
+    // Send feedback (thumbs up/down)
+    async function sendFeedback(score) {
+        if (!chatId) {
+            // If no chatId, try to get it from the most recent message or create a temporary one
+            console.log("No chatId set, attempting to send feedback anyway");
+            // You might want to handle this differently based on your backend
+        }
+        
+        try {
+            const res = await fetch("/feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, chat_id: chatId || "temp", score: score })
+            });
+            if (res.ok) {
+                const btn = score > 0 ? document.querySelector('.thumb-up') : document.querySelector('.thumb-down');
+                const originalBg = btn.style.background;
+                btn.style.background = score > 0 ? 'rgba(40, 167, 69, 0.3)' : 'rgba(220, 53, 69, 0.3)';
+                setTimeout(() => {
+                    btn.style.background = originalBg;
+                }, 500);
+            } else {
+                alert("Failed to submit feedback");
+            }
+        } catch (e) {
+            console.error('Failed to send feedback:', e);
+            alert("Failed to submit feedback");
+        }
+    }
+
+    // Handle Enter key in textarea
+    document.getElementById("messageInput").addEventListener("keydown", function(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+        loadChats();
+        appendMessage("system", "🚀 Welcome to GWI Research Assistant! Ask me anything about market research insights.");
+    });
+</script>
+
+</body>
+</html>
