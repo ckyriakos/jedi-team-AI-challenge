@@ -8,7 +8,20 @@ This task is designed to help us understand how you approach applied‐AI proble
 
 ##    How to Run
 
-<pre> ```bash # Create virtual environment python -m venv venv # Activate it (Linux/macOS) source venv/bin/activate # Install dependencies pip install -r requirements.txt ``` </pre>
+<pre> ```
+
+bash #
+  
+Create virtual environment
+python -m venv venv 
+  
+# Activate it (Linux/macOS)
+source venv/bin/activate 
+
+# Install dependencies 
+pip install -r requirements.txt
+
+``` </pre>
 ---
 
 ## 🧪 Core Scenario
