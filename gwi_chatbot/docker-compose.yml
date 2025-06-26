@@ -1,0 +1,35 @@
+version: "3.9"
+
+networks:
+  ollama-network:
+
+services:
+  app:
+    build: .
+    container_name: gwi_chatbot
+    ports:
+      - "8000:8000"
+    networks:
+      - ollama-network
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"  # Ollama default port
+    networks:
+      - ollama-network
+    volumes:
+      - ollama_data:/root/.ollama
+    command: >
+      sh -c "
+        ollama serve &
+        sleep 5 &&
+        ollama run llama3:8b
+      "
+
+volumes:
+  ollama_data:
+
