@@ -152,15 +152,23 @@ volumes:
 
 ---
 
+## How to evaluate the performance
+
+I suggest following this strategy:
+
+    - Hello ( will receive a predefined response)
+    - Ask something related to the data provided (e.g a percentage, insights in general)
+    - Ask something unrelated to the data or something loosely related to them.
+    - Use phrase "discussed before" to make it add its history to the context it uses.
 
 
 
 ## 🔍 Possible Improvements
 
-* [ ] Frontend using React, Svelte, or Chainlit
+* [ ] Easier to navigate ui.
 * [ ] Logging with LangSmith or OpenTelemetry
-* [ ] Use LangGraph for reasoning trace visualization
-* [ ] Add streaming feedback metrics dashboard
+* [ ] Use LangGraph for reasoning trace visualization and addition of other agents and tools. Also better state management.
+* [ ] Add better prompt evaluation support using another llm.
 * [ ] Replace FAISS with Chroma or Weaviate for more scale
 
 ---
