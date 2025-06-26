@@ -75,6 +75,16 @@ uvicorn app.main:app --reload
 
 ---
 
+##    Testing
+---
+
+```bash
+cd test
+
+python -m unittest <test_cases>
+```
+---
+
 ## 🧠 Features Overview
 
 Using LangChain’s wrappers for HuggingFace and Ollama:
@@ -142,12 +152,8 @@ volumes:
 
 ---
 
-## 📚 Documentation
 
-GitHub Pages version available here:
-👉 [**View Online Docs**](https://<your-username>.github.io/<your-repo-name>/)
 
----
 
 ## 🔍 Possible Improvements
 

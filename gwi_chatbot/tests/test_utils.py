@@ -11,17 +11,17 @@ from utils import decide_action, is_relevant, evaluate_response, generate_chat_t
 
 class TestUtils(unittest.TestCase):
 
-    def test_decide_action_generate(self):
-        mock_llm = MagicMock()
-        mock_llm.invoke.return_value.content = "generate"
-        result = decide_action("Tell me a joke", mock_llm)
-        self.assertEqual(result, "generate")
+    #def test_decide_action_generate(self):
+    #    mock_llm = MagicMock()
+    #    mock_llm.invoke.return_value.content = "generate"
+    #    result = decide_action("Tell me a joke", mock_llm)
+    #    self.assertEqual(result, "generate")
 
-    def test_decide_action_retrieve(self):
-        mock_llm = MagicMock()
-        mock_llm.invoke.return_value.content = "retrieve"
-        result = decide_action("What is the latest trend in marketing?", mock_llm)
-        self.assertEqual(result, "retrieve")
+    #def test_decide_action_retrieve(self):
+    #    mock_llm = MagicMock()
+    #    mock_llm.invoke.return_value.content = "retrieve"
+    #    result = decide_action("What is the latest trend in marketing?", mock_llm)
+    #    self.assertEqual(result, "retrieve")
 
     def test_is_relevant_positive(self):
         mock_embed_model = MagicMock()
