@@ -6,23 +6,11 @@ This task is designed to help us understand how you approach applied‐AI proble
 
 ---
 
-##    How to Run
+## 📚 Documentation and Instructions
 
-<pre> ```
-
-bash #
-  
-Create virtual environment
-python -m venv venv 
-  
-# Activate it (Linux/macOS)
-source venv/bin/activate 
-
-# Install dependencies 
-pip install -r requirements.txt
-
-``` </pre>
----
+GitHub Pages version available here:
+👉 View Online Docs
+https://ckyriakos.github.io/jedi-team-AI-challenge/
 
 ## 🧪 Core Scenario
 
