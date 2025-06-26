@@ -26,8 +26,8 @@ There are two ways to get started — either using Docker (recommended) or manua
 This spins up both the FastAPI app and the `llama3.1:8b` model (via Ollama) in a shared Docker network.
 
 ```bash
-git clone https://github.com/yourname/yourrepo.git
-cd yourrepo
+git clone https://github.com/ckyriakos/jedi-team-AI-challenge
+cd jedi-team-AI-challenge/gwi_chatbot
 docker-compose up --build
 ```
 
@@ -85,7 +85,7 @@ Using LangChain’s wrappers for HuggingFace and Ollama:
 4. **Guardrails**: Skips unproductive requests (e.g., greetings) with predefined responses.
 5. **Vector DB**: Used **FAISS** for in-memory semantic and metadata filtering. It’s lightweight, fast, and ideal for local setups.
 6. **API Server**: FastAPI streams thoughts and answers using **Server-Sent Events (SSE)**.
-7. **Evaluation**: Logged performance metrics with optional LangChain evaluation hooks.
+7. **Evaluation**: Logged performance metrics. Could also integrate Langchain evaluation tools.
 8. **Feedback Loop**: Basic thumbs-up/down system to log and improve responses.
 9. **UX Prompts**: Prompts are designed to guide and engage the user proactively.
 10. **Unit Tests**: Tested key utilities like filters and response validators.
